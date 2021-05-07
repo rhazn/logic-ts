@@ -1,9 +1,9 @@
-name: GitHub Actions Demo
+name: Publish
 
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   publish:
