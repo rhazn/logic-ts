@@ -1,6 +1,5 @@
-import { Formula, PropositionalVariable } from "./Syntax";
-
-export type Interpretation = (formula: Formula) => boolean;
+import { PropositionalVariable } from "./Syntax";
+import { PropositionalWorld } from "./World";
 
 /**
  * Propositional assignment by keeping a set of truthy variables

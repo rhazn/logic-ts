@@ -1,6 +1,6 @@
 {
     "name": "@rhazn/logic-ts",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "description": "Handle logic in typescript",
     "private": false,
     "main": "dist/index.js",
@@ -9,9 +9,15 @@
         "/dist"
     ],
     "scripts": {
-        "build": "tsc"
+        "build": "tsc",
+        "test": "jest --coverage",
+        "test:ci": "jest --coverage --ci"
     },
     "dependencies": {
         "typescript": "^4.2.3"
+    },
+    "devDependencies": {
+        "@types/jest": "^26.0.23",
+        "ts-jest": "^27.0.1"
     }
 }
