@@ -1,6 +1,7 @@
 import { PropositionalAssignment } from "../logic/Semantic";
 import { PropositionalSyntax, PropositionalVariable } from "../logic/Syntax";
 import { PropositionalWorld } from "../logic/World";
+import { WorldPreference } from "../logic/WorldPreference";
 
 export function getAllAssignmentsForSyntax(syntax: PropositionalSyntax): PropositionalAssignment[] {
     return [...syntax].reduce(
@@ -22,8 +23,8 @@ export function getAllWorldsForSyntax(syntax: PropositionalSyntax): Propositiona
     );
 }
 
-export function getInitialPreferenceForSyntax(syntax: PropositionalSyntax): PropositionalWorld[][] {
-    return [getAllWorldsForSyntax(syntax)];
+export function getInitialPreferenceForSyntax(syntax: PropositionalSyntax): WorldPreference {
+    return new WorldPreference([getAllWorldsForSyntax(syntax)]);
 }
 
 export function infOCFToTPTP(infOCFFormula: string) {
