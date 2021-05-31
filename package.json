@@ -1,6 +1,6 @@
 {
     "name": "@rhazn/logic-ts",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "description": "Handle logic in typescript",
     "private": false,
     "repository": {
