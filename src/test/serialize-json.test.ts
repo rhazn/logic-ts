@@ -3,6 +3,7 @@ import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { WorldPreference } from "../logic/WorldPreference";
 import { DMFSystem } from "../logic/DMFSystem";
 import { DMFSystemState } from "../logic/DMFSystemState";
+import { SingleStepBeliefRevisionInput } from "../logic/BeliefRevisionInput";
 
 describe("serialize entities as json", () => {
     describe("propositional worlds", () => {
@@ -112,6 +113,40 @@ describe("serialize entities as json", () => {
                 `{"dmfSystem":{"tpos":[],"edges":[]},"beliefSet":[],"contextIndex":0}`,
             ],
         ])("parse: %o", (input: DMFSystemState, expected: string) => {
+            expect(input.toJson()).toEqual(expected);
+        });
+    });
+
+    describe("single step belief revision", () => {
+        const syntax: PropositionalSyntax = new Set(["a", "b"]);
+
+        test.each([
+            [
+                new SingleStepBeliefRevisionInput(
+                    new WorldPreference([
+                        [
+                            new PropositionalWorld(syntax, new Set(["a", "b"])),
+                            new PropositionalWorld(syntax, new Set(["b"])),
+                            new PropositionalWorld(syntax, new Set(["a"])),
+                            new PropositionalWorld(syntax, new Set([])),
+                        ],
+                    ]),
+                    "a",
+                    new WorldPreference([
+                        [
+                            new PropositionalWorld(syntax, new Set(["a", "b"])),
+                            new PropositionalWorld(syntax, new Set(["a"])),
+                        ],
+                        [new PropositionalWorld(syntax, new Set(["b"])), new PropositionalWorld(syntax, new Set([]))],
+                    ]),
+                ),
+                `{"tpoBefore":[[["a","b"],["b"],["a"],[]]],"tpoAfter":[[["a","b"],["a"]],[["b"],[]]],"input":"a"}`,
+            ],
+            [
+                new SingleStepBeliefRevisionInput(new WorldPreference([]), "", new WorldPreference([])),
+                `{"tpoBefore":[],"tpoAfter":[],"input":""}`,
+            ],
+        ])("parse: %j", (input: SingleStepBeliefRevisionInput, expected: string) => {
             expect(input.toJson()).toEqual(expected);
         });
     });
