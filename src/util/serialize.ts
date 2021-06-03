@@ -46,8 +46,6 @@ export function worldPreferenceBinarySerializer(preference: WorldPreference): Ar
     // Syntax size
     view.setUint32(Uint8Array.BYTES_PER_ELEMENT, syntaxSize);
 
-    const worldView = getMinimalViewForSyntaxSize(syntaxSize, result);
-
     let addedRanks = 0;
     let addedWorlds = 0;
     for (let i = 0; i < preference.data.length; i++) {
@@ -60,7 +58,7 @@ export function worldPreferenceBinarySerializer(preference: WorldPreference): Ar
         const rankOffset =
             Uint8Array.BYTES_PER_ELEMENT +
             Uint32Array.BYTES_PER_ELEMENT +
-            addedWorlds * worldView.BYTES_PER_ELEMENT +
+            addedWorlds * getMinimalByteSyntaxSize(syntaxSize) +
             addedRanks * Uint32Array.BYTES_PER_ELEMENT * 2;
 
         const remainingRanks = preference.data.slice(i + 1, preference.data.length);
@@ -72,12 +70,11 @@ export function worldPreferenceBinarySerializer(preference: WorldPreference): Ar
             nextFilledRankIndex === -1 ? 0 : nextFilledRankIndex,
         );
 
-        const worldViewSize = worldView.BYTES_PER_ELEMENT;
         const worldOffset = rankOffset + Uint32Array.BYTES_PER_ELEMENT * 2;
 
         for (let j = 0; j < rank.length; j++) {
             const world = rank[j];
-            switch (worldViewSize) {
+            switch (getMinimalByteSyntaxSize(syntaxSize)) {
                 case Uint8Array.BYTES_PER_ELEMENT:
                     view.setUint8(worldOffset + j, getWorldNumber(world));
                     break;
@@ -113,14 +110,14 @@ function getWorldNumber(world: PropositionalWorld): number {
 
 function getMinimalByteSyntaxSize(size: number): number {
     if (size <= 8) {
-        return 1;
+        return Uint8Array.BYTES_PER_ELEMENT;
     }
 
     if (size <= 16) {
-        return 2;
+        return Uint16Array.BYTES_PER_ELEMENT;
     }
 
-    return 4;
+    return Uint32Array.BYTES_PER_ELEMENT;
 }
 
 export function getMinimalViewForSyntaxSize(size: number, buffer: ArrayBuffer): Uint8Array | Uint16Array | Uint32Array {
