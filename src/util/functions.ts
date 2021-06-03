@@ -1,6 +1,6 @@
 import { PropositionalAssignment } from "../logic/Semantic";
 import { PropositionalSyntax, PropositionalVariable } from "../logic/Syntax";
-import { PropositionalWorld } from "../logic/World";
+import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { WorldPreference } from "../logic/WorldPreference";
 
 export function getAllAssignmentsForSyntax(syntax: PropositionalSyntax): PropositionalAssignment[] {
