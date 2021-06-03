@@ -2,6 +2,7 @@ import { PropositionalSyntax } from "../logic/Syntax";
 import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { WorldPreference } from "../logic/WorldPreference";
 import { DMFSystem } from "../logic/DMFSystem";
+import { DMFSystemState } from "../logic/DMFSystemState";
 
 describe("serialize entities as json", () => {
     describe("propositional worlds", () => {
@@ -74,6 +75,43 @@ describe("serialize entities as json", () => {
             ],
             [new DMFSystem(new Set([]), new Set()), `{"tpos":[],"edges":[]}`],
         ])("parse: %o", (input: DMFSystem, expected: string) => {
+            expect(input.toJson()).toEqual(expected);
+        });
+    });
+
+    describe("dmf system state", () => {
+        const syntax: PropositionalSyntax = new Set(["a", "b"]);
+
+        test.each([
+            [
+                new DMFSystemState(
+                    new DMFSystem(
+                        new Set([
+                            new WorldPreference([
+                                [
+                                    new PropositionalWorld(syntax, new Set(["a"])),
+                                    new PropositionalWorld(syntax, new Set(["b"])),
+                                ],
+                            ]),
+                            new WorldPreference([
+                                [
+                                    new PropositionalWorld(syntax, new Set([])),
+                                    new PropositionalWorld(syntax, new Set(["a", "b"])),
+                                ],
+                            ]),
+                        ]),
+                        new Set([{ fromIndex: 0, toIndex: 1, formula: "a" }]),
+                    ),
+                    new Set("a"),
+                    1,
+                ),
+                `{"dmfSystem":{"tpos":[[[["a"],["b"]]],[[[],["a","b"]]]],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]},"beliefSet":["a"],"contextIndex":1}`,
+            ],
+            [
+                new DMFSystemState(new DMFSystem(new Set([]), new Set()), new Set(), 0),
+                `{"dmfSystem":{"tpos":[],"edges":[]},"beliefSet":[],"contextIndex":0}`,
+            ],
+        ])("parse: %o", (input: DMFSystemState, expected: string) => {
             expect(input.toJson()).toEqual(expected);
         });
     });

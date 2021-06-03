@@ -8,4 +8,12 @@ export class DMFSystemState {
     public getContext(): WorldPreference {
         return [...this.dmfSystem.tpos][this.contextIndex];
     }
+
+    public toJson(): string {
+        return JSON.stringify({
+            dmfSystem: JSON.parse(this.dmfSystem.toJson()),
+            beliefSet: [...this.beliefSet],
+            contextIndex: this.contextIndex,
+        });
+    }
 }
