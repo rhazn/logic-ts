@@ -1,4 +1,4 @@
-import { PropositionalSyntax } from "../logic/Syntax";
+import { PropositionalSignature } from "../logic/Syntax";
 import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { ParserFactoryBinary } from "./interface/ParserFactoryBinary";
 import { ParserFactoryJson } from "./interface/ParserFactoryJson";
@@ -6,29 +6,29 @@ import { ParserFactoryJson } from "./interface/ParserFactoryJson";
 export class PropositionalWorldParserFactory
     implements ParserFactoryJson<PropositionalWorld>, ParserFactoryBinary<PropositionalWorld>
 {
-    constructor(private syntax: PropositionalSyntax) {}
+    constructor(private signature: PropositionalSignature) {}
 
     public fromJson(json: string): PropositionalWorld {
         const parsed = JSON.parse(json);
 
-        return new PropositionalWorld(this.syntax, new Set(parsed));
+        return new PropositionalWorld(this.signature, new Set(parsed));
     }
 
     public fromBinary(binary: ArrayBuffer): PropositionalWorld {
-        const view = PropositionalWorldParserFactory.getMinimalViewForSyntaxSize(this.syntax.size, binary);
+        const view = PropositionalWorldParserFactory.getMinimalViewForSignatureSize(this.signature.size, binary);
 
-        return PropositionalWorldParserFactory.worldFromNumber(this.syntax, view[0]);
+        return PropositionalWorldParserFactory.worldFromNumber(this.signature, view[0]);
     }
 
-    public static worldFromNumber(syntax: PropositionalSyntax, number: number): PropositionalWorld {
-        const assignment = [...number.toString(2).padStart(syntax.size, "0")].reduce((previous, current, index) => {
-            return previous.concat(current === "1" ? [...syntax][index] : []);
+    public static worldFromNumber(signature: PropositionalSignature, number: number): PropositionalWorld {
+        const assignment = [...number.toString(2).padStart(signature.size, "0")].reduce((previous, current, index) => {
+            return previous.concat(current === "1" ? [...signature][index] : []);
         }, []);
 
-        return new PropositionalWorld(syntax, new Set(assignment));
+        return new PropositionalWorld(signature, new Set(assignment));
     }
 
-    public static getMinimalViewForSyntaxSize(
+    public static getMinimalViewForSignatureSize(
         size: number,
         buffer: ArrayBuffer,
     ): Uint8Array | Uint16Array | Uint32Array {
@@ -43,7 +43,7 @@ export class PropositionalWorldParserFactory
         return new Uint32Array(buffer);
     }
 
-    public static getMinimalByteSyntaxSize(size: number): number {
+    public static getMinimalByteSignatureSize(size: number): number {
         if (size <= 8) {
             return Uint8Array.BYTES_PER_ELEMENT;
         }

@@ -1,4 +1,4 @@
-import { PropositionalSyntax } from "../logic/Syntax";
+import { PropositionalSignature } from "../logic/Syntax";
 import { ParserFactoryBinary } from "./interface/ParserFactoryBinary";
 import { ParserFactoryJson } from "./interface/ParserFactoryJson";
 import { WorldPreference } from "../logic/WorldPreference";
@@ -8,13 +8,13 @@ import { PropositionalWorldParserFactory } from "./PropositionalWorldParserFacto
 export class WorldPreferenceParserFactory
     implements ParserFactoryJson<WorldPreference>, ParserFactoryBinary<WorldPreference>
 {
-    constructor(private syntax: PropositionalSyntax) {}
+    constructor(private signature: PropositionalSignature) {}
 
     public fromJson(json: string): WorldPreference {
         const parsed = JSON.parse(json);
 
         return new WorldPreference(
-            parsed.map(rank => rank.map(assignment => new PropositionalWorld(this.syntax, new Set(assignment)))),
+            parsed.map(rank => rank.map(assignment => new PropositionalWorld(this.signature, new Set(assignment)))),
         );
     }
 
@@ -31,11 +31,11 @@ export class WorldPreferenceParserFactory
         // Ignore version
         offset += Uint8Array.BYTES_PER_ELEMENT;
 
-        // read syntaxsize
-        const syntaxSize = view.getUint32(offset);
+        // read signaturesize
+        const signatureSize = view.getUint32(offset);
         offset += Uint32Array.BYTES_PER_ELEMENT;
 
-        const worldView = PropositionalWorldParserFactory.getMinimalViewForSyntaxSize(syntaxSize, binary);
+        const worldView = PropositionalWorldParserFactory.getMinimalViewForSignatureSize(signatureSize, binary);
 
         let retrieveWorld = view.getUint32.bind(view);
         switch (worldView.BYTES_PER_ELEMENT) {
@@ -62,7 +62,7 @@ export class WorldPreferenceParserFactory
             for (let i = 0; i < numberOfWorlds; i++) {
                 const worldNumber = retrieveWorld(offset + i * worldView.BYTES_PER_ELEMENT);
 
-                rank.push(PropositionalWorldParserFactory.worldFromNumber(this.syntax, worldNumber));
+                rank.push(PropositionalWorldParserFactory.worldFromNumber(this.signature, worldNumber));
             }
 
             offset += numberOfWorlds * worldView.BYTES_PER_ELEMENT;

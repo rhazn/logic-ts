@@ -1,4 +1,4 @@
-import { PropositionalSyntax } from "../logic/Syntax";
+import { PropositionalSignature } from "../logic/Syntax";
 import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { WorldPreference } from "../logic/WorldPreference";
 import { PropositionalWorldParserFactory } from "../serialize/PropositionalWorldParserFactory";
@@ -12,44 +12,53 @@ import { SingleStepBeliefRevisionInput } from "../logic/BeliefRevisionInput";
 
 describe("parsing json", () => {
     describe("propositional worlds", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b", "c"]);
-        const worldParser = new PropositionalWorldParserFactory(syntax);
+        const signature: PropositionalSignature = new Set(["a", "b", "c"]);
+        const worldParser = new PropositionalWorldParserFactory(signature);
 
         test.each([
-            [`["a"]`, new PropositionalWorld(syntax, new Set(["a"]))],
-            [`["a", "b"]`, new PropositionalWorld(syntax, new Set(["a", "b"]))],
-            [`["c", "a", "b"]`, new PropositionalWorld(syntax, new Set(["a", "b", "c"]))],
-            [`[]`, new PropositionalWorld(syntax, new Set([]))],
+            [`["a"]`, new PropositionalWorld(signature, new Set(["a"]))],
+            [`["a", "b"]`, new PropositionalWorld(signature, new Set(["a", "b"]))],
+            [`["c", "a", "b"]`, new PropositionalWorld(signature, new Set(["a", "b", "c"]))],
+            [`[]`, new PropositionalWorld(signature, new Set([]))],
         ])("parse: %j", (input: string, expected: PropositionalWorld) => {
             expect(worldParser.fromJson(input).assignment).toEqual(expected.assignment);
-            expect(worldParser.fromJson(input).syntax).toEqual(expected.syntax);
+            expect(worldParser.fromJson(input).signature).toEqual(expected.signature);
         });
     });
 
     describe("world preferences", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b", "c"]);
-        const preferenceParser = new WorldPreferenceParserFactory(syntax);
+        const signature: PropositionalSignature = new Set(["a", "b", "c"]);
+        const preferenceParser = new WorldPreferenceParserFactory(signature);
 
         test.each([
             [
                 `[[["a"], ["b"]]]`,
                 new WorldPreference([
-                    [new PropositionalWorld(syntax, new Set(["a"])), new PropositionalWorld(syntax, new Set(["b"]))],
+                    [
+                        new PropositionalWorld(signature, new Set(["a"])),
+                        new PropositionalWorld(signature, new Set(["b"])),
+                    ],
                 ]),
             ],
             [
                 `[[["a"], ["b"]], [["a", "c"]]]`,
                 new WorldPreference([
-                    [new PropositionalWorld(syntax, new Set(["a"])), new PropositionalWorld(syntax, new Set(["b"]))],
-                    [new PropositionalWorld(syntax, new Set(["a", "c"]))],
+                    [
+                        new PropositionalWorld(signature, new Set(["a"])),
+                        new PropositionalWorld(signature, new Set(["b"])),
+                    ],
+                    [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
             ],
             [
                 `[[["a"], ["b"]], [], [["a", "c"]]]`,
                 new WorldPreference([
-                    [new PropositionalWorld(syntax, new Set(["a"])), new PropositionalWorld(syntax, new Set(["b"]))],
+                    [
+                        new PropositionalWorld(signature, new Set(["a"])),
+                        new PropositionalWorld(signature, new Set(["b"])),
+                    ],
                     [],
-                    [new PropositionalWorld(syntax, new Set(["a", "c"]))],
+                    [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
             ],
             [`[]`, new WorldPreference([])],
@@ -59,8 +68,8 @@ describe("parsing json", () => {
     });
 
     describe("dmf systems", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b"]);
-        const parser = new DMFSystemParserFactory(syntax);
+        const signature: PropositionalSignature = new Set(["a", "b"]);
+        const parser = new DMFSystemParserFactory(signature);
 
         test.each([
             [
@@ -69,14 +78,14 @@ describe("parsing json", () => {
                     new Set([
                         new WorldPreference([
                             [
-                                new PropositionalWorld(syntax, new Set(["a"])),
-                                new PropositionalWorld(syntax, new Set(["b"])),
+                                new PropositionalWorld(signature, new Set(["a"])),
+                                new PropositionalWorld(signature, new Set(["b"])),
                             ],
                         ]),
                         new WorldPreference([
                             [
-                                new PropositionalWorld(syntax, new Set([])),
-                                new PropositionalWorld(syntax, new Set(["a", "b"])),
+                                new PropositionalWorld(signature, new Set([])),
+                                new PropositionalWorld(signature, new Set(["a", "b"])),
                             ],
                         ]),
                     ]),
@@ -90,8 +99,8 @@ describe("parsing json", () => {
     });
 
     describe("dmf systems state", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b"]);
-        const parser = new DMFSystemStateParserFactory(syntax);
+        const signature: PropositionalSignature = new Set(["a", "b"]);
+        const parser = new DMFSystemStateParserFactory(signature);
 
         test.each([
             [
@@ -101,14 +110,14 @@ describe("parsing json", () => {
                         new Set([
                             new WorldPreference([
                                 [
-                                    new PropositionalWorld(syntax, new Set(["a"])),
-                                    new PropositionalWorld(syntax, new Set(["b"])),
+                                    new PropositionalWorld(signature, new Set(["a"])),
+                                    new PropositionalWorld(signature, new Set(["b"])),
                                 ],
                             ]),
                             new WorldPreference([
                                 [
-                                    new PropositionalWorld(syntax, new Set([])),
-                                    new PropositionalWorld(syntax, new Set(["a", "b"])),
+                                    new PropositionalWorld(signature, new Set([])),
+                                    new PropositionalWorld(signature, new Set(["a", "b"])),
                                 ],
                             ]),
                         ]),
@@ -128,8 +137,8 @@ describe("parsing json", () => {
     });
 
     describe("single step belief revision", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b"]);
-        const parser = new BeliefRevisionInputParserFactory(syntax);
+        const signature: PropositionalSignature = new Set(["a", "b"]);
+        const parser = new BeliefRevisionInputParserFactory(signature);
 
         test.each([
             [
@@ -137,19 +146,22 @@ describe("parsing json", () => {
                 new SingleStepBeliefRevisionInput(
                     new WorldPreference([
                         [
-                            new PropositionalWorld(syntax, new Set(["a", "b"])),
-                            new PropositionalWorld(syntax, new Set(["b"])),
-                            new PropositionalWorld(syntax, new Set(["a"])),
-                            new PropositionalWorld(syntax, new Set([])),
+                            new PropositionalWorld(signature, new Set(["a", "b"])),
+                            new PropositionalWorld(signature, new Set(["b"])),
+                            new PropositionalWorld(signature, new Set(["a"])),
+                            new PropositionalWorld(signature, new Set([])),
                         ],
                     ]),
                     "a",
                     new WorldPreference([
                         [
-                            new PropositionalWorld(syntax, new Set(["a", "b"])),
-                            new PropositionalWorld(syntax, new Set(["a"])),
+                            new PropositionalWorld(signature, new Set(["a", "b"])),
+                            new PropositionalWorld(signature, new Set(["a"])),
                         ],
-                        [new PropositionalWorld(syntax, new Set(["b"])), new PropositionalWorld(syntax, new Set([]))],
+                        [
+                            new PropositionalWorld(signature, new Set(["b"])),
+                            new PropositionalWorld(signature, new Set([])),
+                        ],
                     ]),
                 ),
             ],

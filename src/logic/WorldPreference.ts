@@ -23,18 +23,18 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
             return new ArrayBuffer(0);
         }
 
-        // todo get syntaxsize from a concrete world, dont guess 0,0 is filled
-        const syntaxSize = this.data[0][0].syntax.size;
+        // todo get signaturesize from a concrete world, dont guess 0,0 is filled
+        const signatureSize = this.data[0][0].signature.size;
 
         const result = new ArrayBuffer(
             // Version
             Uint8Array.BYTES_PER_ELEMENT +
-                // Syntax size
+                // Signature size
                 Uint32Array.BYTES_PER_ELEMENT +
                 // Number of worlds in rank + distance to next rank
                 numberOfFilledRanks * (Uint32Array.BYTES_PER_ELEMENT * 2) +
                 // actual worlds
-                numberOfWorlds * PropositionalWorldParserFactory.getMinimalByteSyntaxSize(syntaxSize),
+                numberOfWorlds * PropositionalWorldParserFactory.getMinimalByteSignatureSize(signatureSize),
         );
 
         const view = new DataView(result);
@@ -42,8 +42,8 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
         // Version
         view.setUint8(0, 1);
 
-        // Syntax size
-        view.setUint32(Uint8Array.BYTES_PER_ELEMENT, syntaxSize);
+        // Signature size
+        view.setUint32(Uint8Array.BYTES_PER_ELEMENT, signatureSize);
 
         let addedRanks = 0;
         let addedWorlds = 0;
@@ -57,7 +57,7 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
             const rankOffset =
                 Uint8Array.BYTES_PER_ELEMENT +
                 Uint32Array.BYTES_PER_ELEMENT +
-                addedWorlds * PropositionalWorldParserFactory.getMinimalByteSyntaxSize(syntaxSize) +
+                addedWorlds * PropositionalWorldParserFactory.getMinimalByteSignatureSize(signatureSize) +
                 addedRanks * Uint32Array.BYTES_PER_ELEMENT * 2;
 
             const remainingRanks = this.data.slice(i + 1, this.data.length);
@@ -73,7 +73,7 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
 
             for (let j = 0; j < rank.length; j++) {
                 const world = rank[j];
-                switch (PropositionalWorldParserFactory.getMinimalByteSyntaxSize(syntaxSize)) {
+                switch (PropositionalWorldParserFactory.getMinimalByteSignatureSize(signatureSize)) {
                     case Uint8Array.BYTES_PER_ELEMENT:
                         view.setUint8(worldOffset + j, world.getWorldNumber());
                         break;

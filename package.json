@@ -1,6 +1,6 @@
 {
     "name": "@rhazn/logic-ts",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Handle logic in typescript",
     "private": false,
     "repository": {
@@ -14,9 +14,10 @@
         "/dist"
     ],
     "scripts": {
-        "build": "tsc",
-        "test": "jest --coverage",
-        "test:ci": "jest --coverage --ci"
+        "clean": "rm -Rf dist/",
+        "build": "npm run clean & tsc",
+        "test": "npm run clean & jest --coverage",
+        "test:ci": "npm run clean & jest --coverage --ci"
     },
     "dependencies": {
         "typescript": "^4.2.3"

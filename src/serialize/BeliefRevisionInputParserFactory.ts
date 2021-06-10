@@ -1,13 +1,13 @@
-import { PropositionalSyntax } from "../logic/Syntax";
+import { PropositionalSignature } from "../logic/Syntax";
 import { ParserFactoryJson } from "./interface/ParserFactoryJson";
 import { WorldPreferenceParserFactory } from "./WorldPreferenceParserFactory";
 import { SingleStepBeliefRevisionInput } from "../logic/BeliefRevisionInput";
 
 export class BeliefRevisionInputParserFactory implements ParserFactoryJson<SingleStepBeliefRevisionInput> {
-    constructor(private syntax: PropositionalSyntax) {}
+    constructor(private signature: PropositionalSignature) {}
 
     public fromJson(json: string): SingleStepBeliefRevisionInput {
-        const preferenceFactory = new WorldPreferenceParserFactory(this.syntax);
+        const preferenceFactory = new WorldPreferenceParserFactory(this.signature);
         const parsed = JSON.parse(json);
 
         return new SingleStepBeliefRevisionInput(

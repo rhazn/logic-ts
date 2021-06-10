@@ -1,4 +1,4 @@
-import { PropositionalSyntax } from "../logic/Syntax";
+import { PropositionalSignature } from "../logic/Syntax";
 import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { WorldPreference } from "../logic/WorldPreference";
 import { DMFSystem } from "../logic/DMFSystem";
@@ -7,40 +7,49 @@ import { SingleStepBeliefRevisionInput } from "../logic/BeliefRevisionInput";
 
 describe("serialize entities as json", () => {
     describe("propositional worlds", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b", "c"]);
+        const signature: PropositionalSignature = new Set(["a", "b", "c"]);
 
         test.each([
-            [new PropositionalWorld(syntax, new Set(["a"])), `["a"]`],
-            [new PropositionalWorld(syntax, new Set(["a", "b"])), `["a","b"]`],
-            [new PropositionalWorld(syntax, new Set(["a", "b", "c"])), `["a","b","c"]`],
-            [new PropositionalWorld(syntax, new Set([])), `[]`],
+            [new PropositionalWorld(signature, new Set(["a"])), `["a"]`],
+            [new PropositionalWorld(signature, new Set(["a", "b"])), `["a","b"]`],
+            [new PropositionalWorld(signature, new Set(["a", "b", "c"])), `["a","b","c"]`],
+            [new PropositionalWorld(signature, new Set([])), `[]`],
         ])("serialize: %o", (input: PropositionalWorld, expected: string) => {
             expect(input.toJson()).toEqual(expected);
         });
     });
 
     describe("world preferences", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b", "c"]);
+        const signature: PropositionalSignature = new Set(["a", "b", "c"]);
 
         test.each([
             [
                 new WorldPreference([
-                    [new PropositionalWorld(syntax, new Set(["a"])), new PropositionalWorld(syntax, new Set(["b"]))],
+                    [
+                        new PropositionalWorld(signature, new Set(["a"])),
+                        new PropositionalWorld(signature, new Set(["b"])),
+                    ],
                 ]),
                 `[[["a"],["b"]]]`,
             ],
             [
                 new WorldPreference([
-                    [new PropositionalWorld(syntax, new Set(["a"])), new PropositionalWorld(syntax, new Set(["b"]))],
-                    [new PropositionalWorld(syntax, new Set(["a", "c"]))],
+                    [
+                        new PropositionalWorld(signature, new Set(["a"])),
+                        new PropositionalWorld(signature, new Set(["b"])),
+                    ],
+                    [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
                 `[[["a"],["b"]],[["a","c"]]]`,
             ],
             [
                 new WorldPreference([
-                    [new PropositionalWorld(syntax, new Set(["a"])), new PropositionalWorld(syntax, new Set(["b"]))],
+                    [
+                        new PropositionalWorld(signature, new Set(["a"])),
+                        new PropositionalWorld(signature, new Set(["b"])),
+                    ],
                     [],
-                    [new PropositionalWorld(syntax, new Set(["a", "c"]))],
+                    [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
                 `[[["a"],["b"]],[],[["a","c"]]]`,
             ],
@@ -51,7 +60,7 @@ describe("serialize entities as json", () => {
     });
 
     describe("dmf systems", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b"]);
+        const signature: PropositionalSignature = new Set(["a", "b"]);
 
         test.each([
             [
@@ -59,14 +68,14 @@ describe("serialize entities as json", () => {
                     new Set([
                         new WorldPreference([
                             [
-                                new PropositionalWorld(syntax, new Set(["a"])),
-                                new PropositionalWorld(syntax, new Set(["b"])),
+                                new PropositionalWorld(signature, new Set(["a"])),
+                                new PropositionalWorld(signature, new Set(["b"])),
                             ],
                         ]),
                         new WorldPreference([
                             [
-                                new PropositionalWorld(syntax, new Set([])),
-                                new PropositionalWorld(syntax, new Set(["a", "b"])),
+                                new PropositionalWorld(signature, new Set([])),
+                                new PropositionalWorld(signature, new Set(["a", "b"])),
                             ],
                         ]),
                     ]),
@@ -81,7 +90,7 @@ describe("serialize entities as json", () => {
     });
 
     describe("dmf system state", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b"]);
+        const signature: PropositionalSignature = new Set(["a", "b"]);
 
         test.each([
             [
@@ -90,14 +99,14 @@ describe("serialize entities as json", () => {
                         new Set([
                             new WorldPreference([
                                 [
-                                    new PropositionalWorld(syntax, new Set(["a"])),
-                                    new PropositionalWorld(syntax, new Set(["b"])),
+                                    new PropositionalWorld(signature, new Set(["a"])),
+                                    new PropositionalWorld(signature, new Set(["b"])),
                                 ],
                             ]),
                             new WorldPreference([
                                 [
-                                    new PropositionalWorld(syntax, new Set([])),
-                                    new PropositionalWorld(syntax, new Set(["a", "b"])),
+                                    new PropositionalWorld(signature, new Set([])),
+                                    new PropositionalWorld(signature, new Set(["a", "b"])),
                                 ],
                             ]),
                         ]),
@@ -118,26 +127,29 @@ describe("serialize entities as json", () => {
     });
 
     describe("single step belief revision", () => {
-        const syntax: PropositionalSyntax = new Set(["a", "b"]);
+        const signature: PropositionalSignature = new Set(["a", "b"]);
 
         test.each([
             [
                 new SingleStepBeliefRevisionInput(
                     new WorldPreference([
                         [
-                            new PropositionalWorld(syntax, new Set(["a", "b"])),
-                            new PropositionalWorld(syntax, new Set(["b"])),
-                            new PropositionalWorld(syntax, new Set(["a"])),
-                            new PropositionalWorld(syntax, new Set([])),
+                            new PropositionalWorld(signature, new Set(["a", "b"])),
+                            new PropositionalWorld(signature, new Set(["b"])),
+                            new PropositionalWorld(signature, new Set(["a"])),
+                            new PropositionalWorld(signature, new Set([])),
                         ],
                     ]),
                     "a",
                     new WorldPreference([
                         [
-                            new PropositionalWorld(syntax, new Set(["a", "b"])),
-                            new PropositionalWorld(syntax, new Set(["a"])),
+                            new PropositionalWorld(signature, new Set(["a", "b"])),
+                            new PropositionalWorld(signature, new Set(["a"])),
                         ],
-                        [new PropositionalWorld(syntax, new Set(["b"])), new PropositionalWorld(syntax, new Set([]))],
+                        [
+                            new PropositionalWorld(signature, new Set(["b"])),
+                            new PropositionalWorld(signature, new Set([])),
+                        ],
                     ]),
                 ),
                 `{"tpoBefore":[[["a","b"],["b"],["a"],[]]],"tpoAfter":[[["a","b"],["a"]],[["b"],[]]],"input":"a"}`,

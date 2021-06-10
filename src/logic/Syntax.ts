@@ -28,4 +28,4 @@ export type PropositionalVariable =
 
 export type Formula = string;
 
-export type PropositionalSyntax = Set<PropositionalVariable>;
+export type PropositionalSignature = Set<PropositionalVariable>;

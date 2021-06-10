@@ -1,10 +1,10 @@
 import { PropositionalAssignment } from "../logic/Semantic";
-import { PropositionalSyntax, PropositionalVariable } from "../logic/Syntax";
+import { PropositionalSignature, PropositionalVariable } from "../logic/Syntax";
 import { PropositionalWorld } from "../logic/PropositionalWorld";
 import { WorldPreference } from "../logic/WorldPreference";
 
-export function getAllAssignmentsForSyntax(syntax: PropositionalSyntax): PropositionalAssignment[] {
-    return [...syntax].reduce(
+export function getAllAssignmentsForSignature(signature: PropositionalSignature): PropositionalAssignment[] {
+    return [...signature].reduce(
         (prev: PropositionalAssignment[], curr: PropositionalVariable) => {
             return [
                 ...[...prev].map(assignment => {
@@ -17,14 +17,14 @@ export function getAllAssignmentsForSyntax(syntax: PropositionalSyntax): Proposi
     );
 }
 
-export function getAllWorldsForSyntax(syntax: PropositionalSyntax): PropositionalWorld[] {
-    return (getAllAssignmentsForSyntax(syntax) as PropositionalAssignment[]).map(
-        assignment => new PropositionalWorld(syntax, assignment),
+export function getAllWorldsForSignature(signature: PropositionalSignature): PropositionalWorld[] {
+    return (getAllAssignmentsForSignature(signature) as PropositionalAssignment[]).map(
+        assignment => new PropositionalWorld(signature, assignment),
     );
 }
 
-export function getInitialPreferenceForSyntax(syntax: PropositionalSyntax): WorldPreference {
-    return new WorldPreference([getAllWorldsForSyntax(syntax)]);
+export function getInitialPreferenceForSignature(signature: PropositionalSignature): WorldPreference {
+    return new WorldPreference([getAllWorldsForSignature(signature)]);
 }
 
 export function infOCFToTPTP(infOCFFormula: string) {
