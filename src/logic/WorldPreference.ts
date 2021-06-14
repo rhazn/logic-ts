@@ -92,4 +92,52 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
 
         return result;
     }
+
+    /**
+     * Exports a WorldPreference to a binary representation using a list of ranks for every world.
+     */
+    public toBinaryRanklist(): ArrayBuffer {
+        if (!this.data[0]) {
+            return new ArrayBuffer(0);
+        }
+
+        // todo get signaturesize from a concrete world, dont guess 0,0 is filled
+        const signatureSize = this.data[0][0].signature.size;
+        const possibleWorlds = Math.pow(2, signatureSize);
+
+        // Array buffers are initialized to 0
+        // 4294967295 is the maximum number in an unsigned 32 bit array
+        const result = new ArrayBuffer(
+            // Version
+            Uint8Array.BYTES_PER_ELEMENT +
+                // Signature size
+                Uint32Array.BYTES_PER_ELEMENT +
+                // Ranks
+                possibleWorlds * Uint32Array.BYTES_PER_ELEMENT,
+        );
+
+        const view = new DataView(result);
+
+        // Version
+        view.setUint8(0, 1);
+
+        // Signature size
+        view.setUint32(Uint8Array.BYTES_PER_ELEMENT, signatureSize);
+
+        let rankIndex = 0;
+        for (const rank of this.data) {
+            for (const world of rank) {
+                // we are treating 0 as "does not exist" and shifting all ranks up by one
+                view.setUint32(
+                    Uint8Array.BYTES_PER_ELEMENT +
+                        Uint32Array.BYTES_PER_ELEMENT +
+                        world.getWorldNumber() * Uint32Array.BYTES_PER_ELEMENT,
+                    rankIndex + 1,
+                );
+            }
+            rankIndex++;
+        }
+
+        return result;
+    }
 }

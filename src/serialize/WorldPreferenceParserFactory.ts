@@ -76,4 +76,47 @@ export class WorldPreferenceParserFactory
 
         return new WorldPreference(result);
     }
+
+    public fromBinaryRanklist(binary: ArrayBuffer): WorldPreference {
+        const result = [];
+        const view = new DataView(binary);
+
+        if (view.byteLength === 0) {
+            return new WorldPreference(result);
+        }
+
+        let offset = 0;
+
+        // Ignore version
+        offset += Uint8Array.BYTES_PER_ELEMENT;
+
+        // read signaturesize
+        const signatureSize = view.getUint32(offset);
+        offset += Uint32Array.BYTES_PER_ELEMENT;
+
+        for (let worldIndex = 0; offset < view.byteLength; worldIndex++, offset += Uint32Array.BYTES_PER_ELEMENT) {
+            // ranks are saved with an offset of 1 so that "0" means the world does not exist
+            const rank = view.getUint32(offset) - 1;
+
+            if (rank === -1) {
+                continue;
+            }
+
+            const world = PropositionalWorldParserFactory.worldFromNumber(this.signature, worldIndex);
+
+            if (result[rank] === undefined) {
+                result[rank] = [];
+            }
+
+            result[rank] = [...result[rank], world];
+        }
+
+        for (var i = 0; i < result.length; i++) {
+            if (result[i] === undefined) {
+                result[i] = [];
+            }
+        }
+
+        return new WorldPreference(result);
+    }
 }

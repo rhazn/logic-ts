@@ -66,4 +66,56 @@ describe("parse binary", () => {
             expect(expected.data).toEqual(inputPreference.data);
         });
     });
+
+    describe("world preferences ranklist", () => {
+        const signature: PropositionalSignature = new Set(["a", "b", "c"]);
+        const preferenceParser = new WorldPreferenceParserFactory(signature);
+
+        test.each([
+            [
+                new Uint8Array([
+                    1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0,
+                ]).buffer,
+                new WorldPreference([
+                    [
+                        new PropositionalWorld(signature, new Set(["b"])),
+                        new PropositionalWorld(signature, new Set(["a"])),
+                    ],
+                ]),
+            ],
+            [
+                new Uint8Array([
+                    1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0,
+                    0, 0, 0, 0,
+                ]).buffer,
+                new WorldPreference([
+                    [
+                        new PropositionalWorld(signature, new Set(["b"])),
+                        new PropositionalWorld(signature, new Set(["a"])),
+                    ],
+                    [new PropositionalWorld(signature, new Set(["a", "c"]))],
+                ]),
+            ],
+            [
+                new Uint8Array([
+                    1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0,
+                    0, 0, 0, 0,
+                ]).buffer,
+                new WorldPreference([
+                    [
+                        new PropositionalWorld(signature, new Set(["b"])),
+                        new PropositionalWorld(signature, new Set(["a"])),
+                    ],
+                    [],
+                    [new PropositionalWorld(signature, new Set(["a", "c"]))],
+                ]),
+            ],
+            [new Uint8Array([]).buffer, new WorldPreference([])],
+        ])("parse: %o", (input: ArrayBuffer, expected: WorldPreference) => {
+            const inputPreference = preferenceParser.fromBinaryRanklist(input);
+
+            expect(expected.data).toEqual(inputPreference.data);
+        });
+    });
 });
