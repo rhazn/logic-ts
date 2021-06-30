@@ -32,8 +32,8 @@ describe("parsing json", () => {
 
         test.each([
             [
-                `[[["a"], ["b"]]]`,
-                new WorldPreference([
+                `{"signature":["a","b","c"],"ranks":[[["a"], ["b"]]]}`,
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -41,8 +41,8 @@ describe("parsing json", () => {
                 ]),
             ],
             [
-                `[[["a"], ["b"]], [["a", "c"]]]`,
-                new WorldPreference([
+                `{"signature":["a","b","c"],"ranks":[[["a"], ["b"]], [["a", "c"]]]}`,
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -51,8 +51,8 @@ describe("parsing json", () => {
                 ]),
             ],
             [
-                `[[["a"], ["b"]], [], [["a", "c"]]]`,
-                new WorldPreference([
+                `{"signature":["a","b","c"],"ranks":[[["a"], ["b"]], [], [["a", "c"]]]}`,
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -61,7 +61,7 @@ describe("parsing json", () => {
                     [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
             ],
-            [`[]`, new WorldPreference([])],
+            [`{"signature":["a","b","c"],"ranks":[]}`, new WorldPreference(signature, [])],
         ])("parse: %j", (input: string, expected: WorldPreference) => {
             expect(preferenceParser.fromJson(input).data).toEqual(expected.data);
         });
@@ -73,16 +73,16 @@ describe("parsing json", () => {
 
         test.each([
             [
-                `{"tpos":[[[["a"],["b"]]],[[[],["a","b"]]]],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]}`,
+                `{"tpos":[{"signature":["a","b"],"ranks":[[["a"],["b"]]]},{"signature":["a","b"],"ranks":[[[],["a","b"]]]}],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]}`,
                 new DMFSystem(
                     new Set([
-                        new WorldPreference([
+                        new WorldPreference(signature, [
                             [
                                 new PropositionalWorld(signature, new Set(["a"])),
                                 new PropositionalWorld(signature, new Set(["b"])),
                             ],
                         ]),
-                        new WorldPreference([
+                        new WorldPreference(signature, [
                             [
                                 new PropositionalWorld(signature, new Set([])),
                                 new PropositionalWorld(signature, new Set(["a", "b"])),
@@ -104,34 +104,36 @@ describe("parsing json", () => {
 
         test.each([
             [
-                `{"dmfSystem":{"tpos":[[[["a"],["b"]]],[[[],["a","b"]]]],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]},"beliefSet":["a"],"contextIndex":1}`,
-                new DMFSystemState(
-                    new DMFSystem(
-                        new Set([
-                            new WorldPreference([
-                                [
-                                    new PropositionalWorld(signature, new Set(["a"])),
-                                    new PropositionalWorld(signature, new Set(["b"])),
-                                ],
+                `{"dmfSystem":{"tpos":[{"signature":["a","b"],"ranks":[[["a"],["b"]]]},{"signature":["a","b"],"ranks":[[[],["a","b"]]]}],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]},"states":[{"beliefSet":["a"],"contextIndex":1}]}`,
+                [
+                    new DMFSystemState(
+                        new DMFSystem(
+                            new Set([
+                                new WorldPreference(signature, [
+                                    [
+                                        new PropositionalWorld(signature, new Set(["a"])),
+                                        new PropositionalWorld(signature, new Set(["b"])),
+                                    ],
+                                ]),
+                                new WorldPreference(signature, [
+                                    [
+                                        new PropositionalWorld(signature, new Set([])),
+                                        new PropositionalWorld(signature, new Set(["a", "b"])),
+                                    ],
+                                ]),
                             ]),
-                            new WorldPreference([
-                                [
-                                    new PropositionalWorld(signature, new Set([])),
-                                    new PropositionalWorld(signature, new Set(["a", "b"])),
-                                ],
-                            ]),
-                        ]),
-                        new Set([{ fromIndex: 0, toIndex: 1, formula: "a" }]),
+                            new Set([{ fromIndex: 0, toIndex: 1, formula: "a" }]),
+                        ),
+                        new Set("a"),
+                        1,
                     ),
-                    new Set("a"),
-                    1,
-                ),
+                ],
             ],
             [
-                `{"dmfSystem":{"tpos":[],"edges":[]},"beliefSet":[],"contextIndex":0}`,
-                new DMFSystemState(new DMFSystem(new Set([]), new Set()), new Set(), 0),
+                `{"dmfSystem":{"tpos":[],"edges":[]},"states":[{"beliefSet":[],"contextIndex":0}]}`,
+                [new DMFSystemState(new DMFSystem(new Set([]), new Set()), new Set(), 0)],
             ],
-        ])("parse: %o", (input: string, expected: DMFSystemState) => {
+        ])("parse: %o", (input: string, expected: DMFSystemState[]) => {
             expect(parser.fromJson(input)).toEqual(expected);
         });
     });
@@ -142,9 +144,9 @@ describe("parsing json", () => {
 
         test.each([
             [
-                `{"tpoBefore":[[["a", "b"],["b"],["a"],[]]], "tpoAfter": [[["a", "b"],["a"]],[["b"],[]]], "input": "a"}`,
+                `{"tpoBefore":{"signature":["a","b"],"ranks":[[["a", "b"],["b"],["a"],[]]]}, "tpoAfter": {"signature":["a","b"],"ranks":[[["a", "b"],["a"]],[["b"],[]]]}, "input": "a"}`,
                 new SingleStepBeliefRevisionInput(
-                    new WorldPreference([
+                    new WorldPreference(signature, [
                         [
                             new PropositionalWorld(signature, new Set(["a", "b"])),
                             new PropositionalWorld(signature, new Set(["b"])),
@@ -153,7 +155,7 @@ describe("parsing json", () => {
                         ],
                     ]),
                     "a",
-                    new WorldPreference([
+                    new WorldPreference(signature, [
                         [
                             new PropositionalWorld(signature, new Set(["a", "b"])),
                             new PropositionalWorld(signature, new Set(["a"])),
@@ -166,8 +168,12 @@ describe("parsing json", () => {
                 ),
             ],
             [
-                `{"tpoBefore": [], "tpoAfter": [], "input": ""}`,
-                new SingleStepBeliefRevisionInput(new WorldPreference([]), "", new WorldPreference([])),
+                `{"tpoBefore": {"signature":["a","b"],"ranks":[]}, "tpoAfter": {"signature":["a","b"],"ranks":[]}, "input": ""}`,
+                new SingleStepBeliefRevisionInput(
+                    new WorldPreference(signature, []),
+                    "",
+                    new WorldPreference(signature, []),
+                ),
             ],
         ])("parse: %j", (input: string, expected: SingleStepBeliefRevisionInput) => {
             expect(parser.fromJson(input)).toEqual(expected);

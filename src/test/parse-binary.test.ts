@@ -31,7 +31,7 @@ describe("parse binary", () => {
         test.each([
             [
                 new Uint8Array([1, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 0, 4, 2]).buffer,
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -40,7 +40,7 @@ describe("parse binary", () => {
             ],
             [
                 new Uint8Array([1, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 0, 4, 2, 0, 0, 0, 1, 0, 0, 0, 0, 5]).buffer,
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -50,7 +50,7 @@ describe("parse binary", () => {
             ],
             [
                 new Uint8Array([1, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 1, 4, 2, 0, 0, 0, 1, 0, 0, 0, 0, 5]).buffer,
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -59,7 +59,7 @@ describe("parse binary", () => {
                     [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
             ],
-            [new Uint8Array([]).buffer, new WorldPreference([])],
+            [new Uint8Array([]).buffer, new WorldPreference(signature, [])],
         ])("parse: %o", (input: ArrayBuffer, expected: WorldPreference) => {
             const inputPreference = preferenceParser.fromBinary(input);
 
@@ -77,7 +77,7 @@ describe("parse binary", () => {
                     1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0,
                 ]).buffer,
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["b"])),
                         new PropositionalWorld(signature, new Set(["a"])),
@@ -89,7 +89,7 @@ describe("parse binary", () => {
                     1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0,
                     0, 0, 0, 0,
                 ]).buffer,
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["b"])),
                         new PropositionalWorld(signature, new Set(["a"])),
@@ -102,7 +102,7 @@ describe("parse binary", () => {
                     1, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 0,
                     0, 0, 0, 0,
                 ]).buffer,
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["b"])),
                         new PropositionalWorld(signature, new Set(["a"])),
@@ -111,7 +111,7 @@ describe("parse binary", () => {
                     [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
             ],
-            [new Uint8Array([]).buffer, new WorldPreference([])],
+            [new Uint8Array([]).buffer, new WorldPreference(signature, [])],
         ])("parse: %o", (input: ArrayBuffer, expected: WorldPreference) => {
             const inputPreference = preferenceParser.fromBinaryRanklist(input);
 

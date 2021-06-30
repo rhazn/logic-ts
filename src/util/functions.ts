@@ -24,7 +24,7 @@ export function getAllWorldsForSignature(signature: PropositionalSignature): Pro
 }
 
 export function getInitialPreferenceForSignature(signature: PropositionalSignature): WorldPreference {
-    return new WorldPreference([getAllWorldsForSignature(signature)]);
+    return new WorldPreference(signature, [getAllWorldsForSignature(signature)]);
 }
 
 export function infOCFToTPTP(infOCFFormula: string) {

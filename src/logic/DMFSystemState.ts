@@ -12,8 +12,12 @@ export class DMFSystemState {
     public toJson(): string {
         return JSON.stringify({
             dmfSystem: JSON.parse(this.dmfSystem.toJson()),
-            beliefSet: [...this.beliefSet],
-            contextIndex: this.contextIndex,
+            states: [
+                {
+                    beliefSet: [...this.beliefSet],
+                    contextIndex: this.contextIndex,
+                },
+            ],
         });
     }
 }

@@ -2,12 +2,16 @@ import { PropositionalWorldParserFactory } from "../serialize/PropositionalWorld
 import { SerializableBinary } from "../serialize/interface/SerializeableBinary";
 import { SerializableJson } from "../serialize/interface/SerializeableJson";
 import { PropositionalWorld } from "./PropositionalWorld";
+import { PropositionalSignature } from "./Syntax";
 
 export class WorldPreference implements SerializableJson, SerializableBinary {
-    constructor(public data: PropositionalWorld[][]) {}
+    constructor(public signature: PropositionalSignature, public data: PropositionalWorld[][]) {}
 
     public toJson(): string {
-        return JSON.stringify(this.data.map(rank => rank.map(world => [...world.assignment])));
+        return JSON.stringify({
+            signature: [...this.signature],
+            ranks: this.data.map(rank => rank.map(world => JSON.parse(world.toJson()))),
+        });
     }
 
     public toBinary(): ArrayBuffer {
@@ -23,8 +27,7 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
             return new ArrayBuffer(0);
         }
 
-        // todo get signaturesize from a concrete world, dont guess 0,0 is filled
-        const signatureSize = this.data[0][0].signature.size;
+        const signatureSize = this.signature.size;
 
         const result = new ArrayBuffer(
             // Version
@@ -101,8 +104,7 @@ export class WorldPreference implements SerializableJson, SerializableBinary {
             return new ArrayBuffer(0);
         }
 
-        // todo get signaturesize from a concrete world, dont guess 0,0 is filled
-        const signatureSize = this.data[0][0].signature.size;
+        const signatureSize = this.signature.size;
         const possibleWorlds = Math.pow(2, signatureSize);
 
         // Array buffers are initialized to 0

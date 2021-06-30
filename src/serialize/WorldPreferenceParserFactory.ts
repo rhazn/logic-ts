@@ -12,9 +12,17 @@ export class WorldPreferenceParserFactory
 
     public fromJson(json: string): WorldPreference {
         const parsed = JSON.parse(json);
+        const signature = new Set(parsed.signature) as PropositionalSignature;
+
+        if (signature.size !== this.signature.size) {
+            throw Error(
+                `Signature size does not match. Found in data: ${signature.size}, defined in parser: ${this.signature.size}.`,
+            );
+        }
 
         return new WorldPreference(
-            parsed.map(rank => rank.map(assignment => new PropositionalWorld(this.signature, new Set(assignment)))),
+            signature,
+            parsed.ranks.map(rank => rank.map(assignment => new PropositionalWorld(signature, new Set(assignment)))),
         );
     }
 
@@ -23,7 +31,7 @@ export class WorldPreferenceParserFactory
         const view = new DataView(binary);
 
         if (view.byteLength === 0) {
-            return new WorldPreference(result);
+            return new WorldPreference(this.signature, result);
         }
 
         let offset = 0;
@@ -33,6 +41,12 @@ export class WorldPreferenceParserFactory
 
         // read signaturesize
         const signatureSize = view.getUint32(offset);
+        if (signatureSize !== this.signature.size) {
+            throw Error(
+                `Signature size does not match. Found in data: ${signatureSize}, defined in parser: ${this.signature.size}.`,
+            );
+        }
+
         offset += Uint32Array.BYTES_PER_ELEMENT;
 
         const worldView = PropositionalWorldParserFactory.getMinimalViewForSignatureSize(signatureSize, binary);
@@ -74,7 +88,7 @@ export class WorldPreferenceParserFactory
             }
         }
 
-        return new WorldPreference(result);
+        return new WorldPreference(this.signature, result);
     }
 
     public fromBinaryRanklist(binary: ArrayBuffer): WorldPreference {
@@ -82,7 +96,7 @@ export class WorldPreferenceParserFactory
         const view = new DataView(binary);
 
         if (view.byteLength === 0) {
-            return new WorldPreference(result);
+            return new WorldPreference(this.signature, result);
         }
 
         let offset = 0;
@@ -92,6 +106,13 @@ export class WorldPreferenceParserFactory
 
         // read signaturesize
         const signatureSize = view.getUint32(offset);
+
+        if (signatureSize !== this.signature.size) {
+            throw Error(
+                `Signature size does not match. Found in data: ${signatureSize}, defined in parser: ${this.signature.size}.`,
+            );
+        }
+
         offset += Uint32Array.BYTES_PER_ELEMENT;
 
         for (let worldIndex = 0; offset < view.byteLength; worldIndex++, offset += Uint32Array.BYTES_PER_ELEMENT) {
@@ -117,6 +138,6 @@ export class WorldPreferenceParserFactory
             }
         }
 
-        return new WorldPreference(result);
+        return new WorldPreference(this.signature, result);
     }
 }

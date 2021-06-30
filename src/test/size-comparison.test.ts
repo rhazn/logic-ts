@@ -8,7 +8,7 @@ describe.skip("serialize world preference sizes", () => {
             const signature = new Set("abcdefghijklmnopqrstuvwxyz".substr(0, i).split("")) as PropositionalSignature;
 
             const worlds = getAllWorldsForSignature(signature);
-            const preference = new WorldPreference([worlds]);
+            const preference = new WorldPreference(signature, [worlds]);
 
             //const serializedJSON = preference.toJson();
             //const serializedBinary = preference.toBinary();

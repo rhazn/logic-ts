@@ -23,7 +23,7 @@ describe("serialize entities to binary", () => {
 
         test.each([
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -32,7 +32,7 @@ describe("serialize entities to binary", () => {
                 new DataView(new Uint8Array([1, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 0, 4, 2]).buffer),
             ],
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -44,7 +44,7 @@ describe("serialize entities to binary", () => {
                 ),
             ],
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -56,7 +56,7 @@ describe("serialize entities to binary", () => {
                     new Uint8Array([1, 0, 0, 0, 3, 0, 0, 0, 2, 0, 0, 0, 1, 4, 2, 0, 0, 0, 1, 0, 0, 0, 0, 5]).buffer,
                 ),
             ],
-            [new WorldPreference([]), new DataView(new Uint8Array([]).buffer)],
+            [new WorldPreference(signature, []), new DataView(new Uint8Array([]).buffer)],
         ])("parse: %o", (input: WorldPreference, expected: DataView) => {
             const serialized = new DataView(input.toBinary());
 
@@ -73,7 +73,7 @@ describe("serialize entities to binary", () => {
 
         test.each([
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -87,7 +87,7 @@ describe("serialize entities to binary", () => {
                 ),
             ],
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -102,7 +102,7 @@ describe("serialize entities to binary", () => {
                 ),
             ],
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -117,7 +117,7 @@ describe("serialize entities to binary", () => {
                     ]).buffer,
                 ),
             ],
-            [new WorldPreference([]), new DataView(new Uint8Array([]).buffer)],
+            [new WorldPreference(signature, []), new DataView(new Uint8Array([]).buffer)],
         ])("parse: %o", (input: WorldPreference, expected: DataView) => {
             const serialized = new DataView(input.toBinaryRanklist());
 

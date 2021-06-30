@@ -24,26 +24,26 @@ describe("serialize entities as json", () => {
 
         test.each([
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
                     ],
                 ]),
-                `[[["a"],["b"]]]`,
+                `{"signature":["a","b","c"],"ranks":[[["a"],["b"]]]}`,
             ],
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
                     ],
                     [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
-                `[[["a"],["b"]],[["a","c"]]]`,
+                `{"signature":["a","b","c"],"ranks":[[["a"],["b"]],[["a","c"]]]}`,
             ],
             [
-                new WorldPreference([
+                new WorldPreference(signature, [
                     [
                         new PropositionalWorld(signature, new Set(["a"])),
                         new PropositionalWorld(signature, new Set(["b"])),
@@ -51,14 +51,13 @@ describe("serialize entities as json", () => {
                     [],
                     [new PropositionalWorld(signature, new Set(["a", "c"]))],
                 ]),
-                `[[["a"],["b"]],[],[["a","c"]]]`,
+                `{"signature":["a","b","c"],"ranks":[[["a"],["b"]],[],[["a","c"]]]}`,
             ],
-            [new WorldPreference([]), `[]`],
+            [new WorldPreference(signature, []), `{"signature":["a","b","c"],"ranks":[]}`],
         ])("parse: %o", (input: WorldPreference, expected: string) => {
             expect(input.toJson()).toEqual(expected);
         });
     });
-
     describe("dmf systems", () => {
         const signature: PropositionalSignature = new Set(["a", "b"]);
 
@@ -66,13 +65,13 @@ describe("serialize entities as json", () => {
             [
                 new DMFSystem(
                     new Set([
-                        new WorldPreference([
+                        new WorldPreference(signature, [
                             [
                                 new PropositionalWorld(signature, new Set(["a"])),
                                 new PropositionalWorld(signature, new Set(["b"])),
                             ],
                         ]),
-                        new WorldPreference([
+                        new WorldPreference(signature, [
                             [
                                 new PropositionalWorld(signature, new Set([])),
                                 new PropositionalWorld(signature, new Set(["a", "b"])),
@@ -81,7 +80,7 @@ describe("serialize entities as json", () => {
                     ]),
                     new Set([{ fromIndex: 0, toIndex: 1, formula: "a" }]),
                 ),
-                `{"tpos":[[[["a"],["b"]]],[[[],["a","b"]]]],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]}`,
+                `{"tpos":[{"signature":["a","b"],"ranks":[[["a"],["b"]]]},{"signature":["a","b"],"ranks":[[[],["a","b"]]]}],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]}`,
             ],
             [new DMFSystem(new Set([]), new Set()), `{"tpos":[],"edges":[]}`],
         ])("parse: %o", (input: DMFSystem, expected: string) => {
@@ -97,13 +96,13 @@ describe("serialize entities as json", () => {
                 new DMFSystemState(
                     new DMFSystem(
                         new Set([
-                            new WorldPreference([
+                            new WorldPreference(signature, [
                                 [
                                     new PropositionalWorld(signature, new Set(["a"])),
                                     new PropositionalWorld(signature, new Set(["b"])),
                                 ],
                             ]),
-                            new WorldPreference([
+                            new WorldPreference(signature, [
                                 [
                                     new PropositionalWorld(signature, new Set([])),
                                     new PropositionalWorld(signature, new Set(["a", "b"])),
@@ -115,11 +114,11 @@ describe("serialize entities as json", () => {
                     new Set("a"),
                     1,
                 ),
-                `{"dmfSystem":{"tpos":[[[["a"],["b"]]],[[[],["a","b"]]]],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]},"beliefSet":["a"],"contextIndex":1}`,
+                `{"dmfSystem":{"tpos":[{"signature":["a","b"],"ranks":[[["a"],["b"]]]},{"signature":["a","b"],"ranks":[[[],["a","b"]]]}],"edges":[{"fromIndex":0,"toIndex":1,"formula":"a"}]},"states":[{"beliefSet":["a"],"contextIndex":1}]}`,
             ],
             [
                 new DMFSystemState(new DMFSystem(new Set([]), new Set()), new Set(), 0),
-                `{"dmfSystem":{"tpos":[],"edges":[]},"beliefSet":[],"contextIndex":0}`,
+                `{"dmfSystem":{"tpos":[],"edges":[]},"states":[{"beliefSet":[],"contextIndex":0}]}`,
             ],
         ])("parse: %o", (input: DMFSystemState, expected: string) => {
             expect(input.toJson()).toEqual(expected);
@@ -132,7 +131,7 @@ describe("serialize entities as json", () => {
         test.each([
             [
                 new SingleStepBeliefRevisionInput(
-                    new WorldPreference([
+                    new WorldPreference(signature, [
                         [
                             new PropositionalWorld(signature, new Set(["a", "b"])),
                             new PropositionalWorld(signature, new Set(["b"])),
@@ -141,7 +140,7 @@ describe("serialize entities as json", () => {
                         ],
                     ]),
                     "a",
-                    new WorldPreference([
+                    new WorldPreference(signature, [
                         [
                             new PropositionalWorld(signature, new Set(["a", "b"])),
                             new PropositionalWorld(signature, new Set(["a"])),
@@ -152,11 +151,15 @@ describe("serialize entities as json", () => {
                         ],
                     ]),
                 ),
-                `{"tpoBefore":[[["a","b"],["b"],["a"],[]]],"tpoAfter":[[["a","b"],["a"]],[["b"],[]]],"input":"a"}`,
+                `{"tpoBefore":{"signature":["a","b"],"ranks":[[["a","b"],["b"],["a"],[]]]},"tpoAfter":{"signature":["a","b"],"ranks":[[["a","b"],["a"]],[["b"],[]]]},"input":"a"}`,
             ],
             [
-                new SingleStepBeliefRevisionInput(new WorldPreference([]), "", new WorldPreference([])),
-                `{"tpoBefore":[],"tpoAfter":[],"input":""}`,
+                new SingleStepBeliefRevisionInput(
+                    new WorldPreference(signature, []),
+                    "",
+                    new WorldPreference(signature, []),
+                ),
+                `{"tpoBefore":{"signature":["a","b"],"ranks":[]},"tpoAfter":{"signature":["a","b"],"ranks":[]},"input":""}`,
             ],
         ])("parse: %j", (input: SingleStepBeliefRevisionInput, expected: string) => {
             expect(input.toJson()).toEqual(expected);
