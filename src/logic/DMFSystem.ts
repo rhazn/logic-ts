@@ -25,7 +25,13 @@ export class DMFSystem implements SerializableJson {
     }
 
     public removeTpo(index: number): DMFSystem {
-        const edgesToDelete = [];
+        [...this.edges]
+            .filter(edge => {
+                return edge.fromIndex === index || edge.toIndex === index;
+            })
+            .forEach(edge => {
+                this.edges.delete(edge);
+            });
 
         this.edges.forEach(edge => {
             if (edge.fromIndex > index) {
@@ -35,14 +41,6 @@ export class DMFSystem implements SerializableJson {
             if (edge.toIndex > index) {
                 edge.toIndex -= 1;
             }
-
-            if (edge.fromIndex === index || edge.toIndex === index) {
-                edgesToDelete.push(edge);
-            }
-        });
-
-        edgesToDelete.forEach(edge => {
-            this.edges.delete(edge);
         });
 
         this.tpos.delete([...this.tpos][index]);
